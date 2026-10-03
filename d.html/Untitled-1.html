@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title> Gecen zaman 💗</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffe4ec;
+    --bg2: #ffd1e0;
+    --card: rgba(255, 255, 255, .55);
+    --rose: #d6336c;
+    --text: #7a1f45;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 50% 30%, var(--bg) 0%, var(--bg2) 100%);
+    font-family: 'Quicksand', system-ui, sans-serif;
+    color: var(--text);
+    overflow: hidden;
+  }
+  .rain { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .drop {
+    position: absolute; top: -60px;
+    animation: fall linear forwards;
+    will-change: transform;
+  }
+  .rose { filter: hue-rotate(-18deg) saturate(.75) brightness(1.25); }
+  @keyframes fall {
+    0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+    10%  { opacity: .9; }
+    90%  { opacity: .9; }
+    100% { transform: translate3d(var(--drift), 110vh, 0) rotate(var(--spin)); opacity: 0; }
+  }
+  main {
+    position: relative; z-index: 1;
+    width: min(92vw, 720px);
+    padding: clamp(24px, 5vw, 48px);
+    text-align: center;
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, .8);
+    border-radius: 36px;
+    box-shadow: 0 20px 60px rgba(214, 51, 108, .25);
+  }
+  h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2.2rem, 7vw, 3.6rem);
+    color: var(--rose);
+    line-height: 1.1;
+  }
+  .sub { margin-top: 8px; font-size: clamp(.9rem, 2.6vw, 1.05rem); opacity: .85; }
+  .grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: clamp(8px, 2vw, 18px);
+    margin-top: clamp(20px, 4vw, 34px);
+  }
+  .box {
+    background: #fff;
+    border-radius: 22px;
+    padding: clamp(12px, 3vw, 22px) 4px;
+    box-shadow: 0 6px 18px rgba(214, 51, 108, .15);
+  }
+  .num {
+    display: block;
+    font-size: clamp(1.8rem, 7vw, 3.4rem);
+    font-weight: 700; color: var(--rose);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .lbl { display: block; margin-top: 8px; font-size: clamp(.75rem, 2.4vw, 1rem); font-weight: 500; }
+  @media (prefers-reduced-motion: reduce) { .rain { display: none; } }
+</style>
+</head>
+<body>
+  <div class="rain" id="rain" aria-hidden="true"></div>
+
+  <main>
+    <h1> Gecen Zaman</h1>
+    <p class="sub">26 Eylül 2026, 22:16'dan beri</p>
+    <div class="grid" role="timer" aria-live="off">
+      <div class="box"><span class="num" id="d">0</span><span class="lbl">Gün</span></div>
+      <div class="box"><span class="num" id="h">00</span><span class="lbl">Saat</span></div>
+      <div class="box"><span class="num" id="m">00</span><span class="lbl">Dakika</span></div>
+      <div class="box"><span class="num" id="s">00</span><span class="lbl">Saniye</span></div>
+    </div>
+  </main>
+
+<script>
+  // Başlangıç: 26.09.2026 22:16 (ay 0'dan başladığı için Eylül = 8)
+  const start = new Date(2026, 8, 26, 22, 16, 0);
+  const pad = n => String(n).padStart(2, '0');
+  const el = id => document.getElementById(id);
+
+  function tick() {
+    let diff = Math.max(0, Math.floor((Date.now() - start) / 1000));
+    el('d').textContent = Math.floor(diff / 86400);
+    el('h').textContent = pad(Math.floor(diff % 86400 / 3600));
+    el('m').textContent = pad(Math.floor(diff % 3600 / 60));
+    el('s').textContent = pad(diff % 60);
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  // Sürekli yağan kalp ve güller
+  const rain = el('rain');
+  const items = ['💗', '💖', '💕', '🩷', '🌹', '💗', '🌹'];
+  function drop() {
+    const d = document.createElement('span');
+    const emoji = items[Math.floor(Math.random() * items.length)];
+    d.className = 'drop' + (emoji === '🌹' ? ' rose' : '');
+    d.textContent = emoji;
+    d.style.left = Math.random() * 100 + 'vw';
+    d.style.fontSize = 16 + Math.random() * 28 + 'px';
+    d.style.animationDuration = 6 + Math.random() * 6 + 's';
+    d.style.setProperty('--drift', (Math.random() * 160 - 80) + 'px');
+    d.style.setProperty('--spin', (Math.random() * 360 - 180) + 'deg');
+    rain.appendChild(d);
+    d.addEventListener('animationend', () => d.remove());
+  }
+  for (let i = 0; i < 14; i++) setTimeout(drop, i * 150);
+  setInterval(drop, 320);
+</script>
+</body>
+</html>
